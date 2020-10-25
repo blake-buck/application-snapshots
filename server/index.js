@@ -1,10 +1,8 @@
-async function runTest(url, environment, dimensions, scriptFile){
+async function runTest(url, environment, dimensions, scriptFile, deviceName, testName){
     const script = require('./scripts/' + scriptFile);
 
-    return await script(url, environment, dimensions);
+    return await script(url, environment, dimensions, deviceName, testName);
 }
-
-// runTest('https://row-board-task.com', 'chromium', {width:1200, height:800}, 'navigateAndScreenshot');
 
 const express = require('express');
 const cors = require('cors');
@@ -32,15 +30,12 @@ app.post('/test-script/run/collection', async (req, res) => {
 
             const {path, script} = test;
             const {width, height, environment} = device;
-            console.log(baseUrl+path);
-            testResults.push(runTest(baseUrl+path, environment, {width:+width, height:+height}, script));
+            testResults.push(runTest(baseUrl+path, environment, {width:+width, height:+height}, script, device.name, test.name));
         }
     }
 
     testResults = await Promise.all(testResults);
 
-    console.log('TEST RESULTS');
-    console.log(testResults);
     res.status(200).send({testResults});
 })
 
