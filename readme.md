@@ -1,0 +1,1 @@
+Long term goal is for this project to act as a sort of postman but for e2e testing tool.

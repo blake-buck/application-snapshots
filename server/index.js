@@ -4,6 +4,7 @@ async function runTest(url, environment, dimensions, scriptFile, deviceName, tes
     return await script(url, environment, dimensions, deviceName, testName);
 }
 
+const fs = require('fs').promises;
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -15,11 +16,10 @@ app.use(express.static('/storage'));
 app.post('/test-script/run', async (req, res) => {
     const {url, environment, dimensions, scriptFile} = req.body;
     const results = await runTest(url, environment, dimensions, scriptFile);
-    res.status(200).send({results});
+    res.status(200).send({testResults:[results]});
 });
 
 app.post('/test-script/run/collection', async (req, res) => {
-    // console.log(req.body);
     const {baseUrl, tests, devices} = req.body;
     let testResults = [];
 
@@ -37,8 +37,18 @@ app.post('/test-script/run/collection', async (req, res) => {
     testResults = await Promise.all(testResults);
 
     res.status(200).send({testResults});
-})
+});
 
-
+app.get('/test-suites', async (req, res) => {
+    const suites = await fs.readFile('./storage/suites/suites.json', {encoding:'utf8'});
+    console.log(suites);
+    res.status(200).json(suites)
+});
+app.get('/test-suite/:id', async (req, res) => {
+    
+});
+app.post('/test-suite');
+app.put('/test-suite/:id');
+app.delete('/test-suite/:id');
 
 app.listen(9090, () => console.log('listening on port 9090'));
